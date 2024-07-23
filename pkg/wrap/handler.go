@@ -68,6 +68,35 @@ func ContinueSliceAsync[T any, TT any](f SuccessorSlice[T, TT], r ...Output[T]) 
 	})
 }
 
+
+func ContinueSplitForEach[T any, TT any](f Successor[T, TT], r Output[[]T]) []Output[TT] {
+	if r.IsOK() {
+		var defaultV []T
+		values := r.GetOrDefault(defaultV)
+		res := make([]Output[TT], len(values))
+		for _, v := range values {
+			res = append(res, f(v))
+		}
+		return res
+	}
+	return []Output[TT]{Err[TT](r.ErrorOrNil())}
+}
+
+func ContinueSplitForEachAsync[T any, TT any](f Successor[T, TT], r Output[[]T]) []Output[TT] {
+	if r.IsOK() {
+		var defaultV []T
+		values := r.GetOrDefault(defaultV)
+		res := make([]Output[TT], len(values))
+		for _, v := range values {
+			res = append(res, Async(func() Output[TT] {
+				return f(v)
+			}))
+		}
+		return res
+	}
+	return []Output[TT]{Err[TT](r.ErrorOrNil())}
+}
+
 func Wrap[T any](val T, err error) Output[T] {
 	if err != nil {
 		return Err[T](err)
