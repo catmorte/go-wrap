@@ -35,7 +35,7 @@ func ProofAsync(r ...ErrorContainer) Output[Void] {
 }
 
 func ContinueForEach[T any, TT any](f Successor[T, TT], r ...Output[T]) []Output[TT] {
-	var res []Output[TT]
+	res := make([]Output[TT], len(r))
 	for _, v := range r {
 		res = append(res, Continue(f, v))
 	}
@@ -43,7 +43,7 @@ func ContinueForEach[T any, TT any](f Successor[T, TT], r ...Output[T]) []Output
 }
 
 func ContinueForEachAsync[T any, TT any](f Successor[T, TT], r ...Output[T]) []Output[TT] {
-	var res []Output[TT]
+	res := make([]Output[TT], len(r))
 	for _, v := range r {
 		res = append(res, ContinueAsync(f, v))
 	}
@@ -51,7 +51,7 @@ func ContinueForEachAsync[T any, TT any](f Successor[T, TT], r ...Output[T]) []O
 }
 
 func ContinueSlice[T any, TT any](f SuccessorSlice[T, TT], r ...Output[T]) Output[[]TT] {
-	var res []T
+	res := make([]T, len(r))
 	for _, v := range r {
 		if v.IsError() {
 			return Err[[]TT](v.ErrorOrNil())
@@ -67,7 +67,6 @@ func ContinueSliceAsync[T any, TT any](f SuccessorSlice[T, TT], r ...Output[T]) 
 		return ContinueSlice(f, r...)
 	})
 }
-
 
 func ContinueSplitForEach[T any, TT any](f Successor[T, TT], r Output[[]T]) []Output[TT] {
 	if r.IsOK() {
