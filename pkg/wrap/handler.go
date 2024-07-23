@@ -5,7 +5,7 @@ type (
 	SuccessorSlice[T any, TT any] func([]T) Output[[]TT]
 )
 
-func Continue[T any, TT any](f Successor[T, TT], r Output[T]) Output[TT] {
+func Next[T any, TT any](f Successor[T, TT], r Output[T]) Output[TT] {
 	if r.IsOK() {
 		var defaultV T
 		return f(r.GetOrDefault(defaultV))
@@ -13,9 +13,9 @@ func Continue[T any, TT any](f Successor[T, TT], r Output[T]) Output[TT] {
 	return Err[TT](r.ErrorOrNil())
 }
 
-func ContinueAsync[T any, TT any](f Successor[T, TT], r Output[T]) Output[TT] {
+func NextAsync[T any, TT any](f Successor[T, TT], r Output[T]) Output[TT] {
 	return Async[TT](func() Output[TT] {
-		return Continue[T, TT](f, r)
+		return Next[T, TT](f, r)
 	})
 }
 
@@ -34,23 +34,23 @@ func ProofAsync(r ...ErrorContainer) Output[Void] {
 	})
 }
 
-func ContinueForEach[T any, TT any](f Successor[T, TT], r ...Output[T]) []Output[TT] {
+func ForEach[T any, TT any](f Successor[T, TT], r ...Output[T]) []Output[TT] {
 	res := make([]Output[TT], len(r))
 	for _, v := range r {
-		res = append(res, Continue(f, v))
+		res = append(res, Next(f, v))
 	}
 	return res
 }
 
-func ContinueForEachAsync[T any, TT any](f Successor[T, TT], r ...Output[T]) []Output[TT] {
+func ForEachAsync[T any, TT any](f Successor[T, TT], r ...Output[T]) []Output[TT] {
 	res := make([]Output[TT], len(r))
 	for _, v := range r {
-		res = append(res, ContinueAsync(f, v))
+		res = append(res, NextAsync(f, v))
 	}
 	return res
 }
 
-func ContinueSlice[T any, TT any](f SuccessorSlice[T, TT], r ...Output[T]) Output[[]TT] {
+func Join[T any, TT any](f SuccessorSlice[T, TT], r ...Output[T]) Output[[]TT] {
 	res := make([]T, len(r))
 	for _, v := range r {
 		if v.IsError() {
@@ -62,13 +62,13 @@ func ContinueSlice[T any, TT any](f SuccessorSlice[T, TT], r ...Output[T]) Outpu
 	return f(res)
 }
 
-func ContinueSliceAsync[T any, TT any](f SuccessorSlice[T, TT], r ...Output[T]) Output[[]TT] {
+func JoinAsync[T any, TT any](f SuccessorSlice[T, TT], r ...Output[T]) Output[[]TT] {
 	return Async[[]TT](func() Output[[]TT] {
-		return ContinueSlice(f, r...)
+		return Join(f, r...)
 	})
 }
 
-func ContinueSplitForEach[T any, TT any](f Successor[T, TT], r Output[[]T]) []Output[TT] {
+func DisJoin[T any, TT any](f Successor[T, TT], r Output[[]T]) []Output[TT] {
 	if r.IsOK() {
 		var defaultV []T
 		values := r.GetOrDefault(defaultV)
@@ -81,7 +81,7 @@ func ContinueSplitForEach[T any, TT any](f Successor[T, TT], r Output[[]T]) []Ou
 	return []Output[TT]{Err[TT](r.ErrorOrNil())}
 }
 
-func ContinueSplitForEachAsync[T any, TT any](f Successor[T, TT], r Output[[]T]) []Output[TT] {
+func DisJoinAsync[T any, TT any](f Successor[T, TT], r Output[[]T]) []Output[TT] {
 	if r.IsOK() {
 		var defaultV []T
 		values := r.GetOrDefault(defaultV)
