@@ -8,7 +8,7 @@ func (e err[T]) ErrorOrNil() error {
 	return e.err
 }
 
-func (e err[T]) Flat(_ func(T), onError func(error)) Output[T] {
+func (e err[T]) Flat(_ func(T), onError func(error)) Out[T] {
 	onError(e.err)
 	return e
 }
@@ -29,16 +29,16 @@ func (err[T]) IsOK() bool {
 	return false
 }
 
-func (f err[T]) IfError(onError func(error)) Output[T] {
+func (f err[T]) IfError(onError func(error)) Out[T] {
 	onError(f.err)
 	return f
 }
 
-func (e err[T]) IfOK(onOK func(T)) Output[T] {
+func (e err[T]) IfOK(onOK func(T)) Out[T] {
 	return e
 }
 
-func Err[T any](e error) Output[T] {
+func Err[T any](e error) Out[T] {
 	output := new(err[T])
 	output.err = e
 
