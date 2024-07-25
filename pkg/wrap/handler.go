@@ -1,5 +1,9 @@
 package wrap
 
+import "errors"
+
+var ErrChanClosed = errors.New("channel closed")
+
 type (
 	Successor[T any, TT any]      func(T) Out[TT]
 	SuccessorSlice[T any, TT any] func([]T) Out[[]TT]
@@ -89,6 +93,20 @@ func DisJoin[T any](r Out[[]T]) []Out[T] {
 		return res
 	}
 	return []Out[T]{Err[T](r.ErrorOrNil())}
+}
+
+func ReadChan[T any](ch <-chan T, onClosed func() Out[T]) Out[T] {
+	v, ok := <-ch
+	if ok {
+		return OK(v)
+	}
+	return onClosed()
+}
+
+func ReadChanAsync[T any](ch <-chan T, onClosed func() Out[T]) Out[T] {
+	return Async[T](func() Out[T] {
+		return ReadChan(ch, onClosed)
+	})
 }
 
 func Wrap[T any](val T, err error) Out[T] {
