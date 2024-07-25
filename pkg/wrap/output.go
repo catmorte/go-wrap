@@ -1,8 +1,7 @@
 package wrap
 
 type (
-	Void    struct{}
-	OutVoid Out[Void]
+	Empty struct{}
 
 	ErrorContainer interface {
 		ErrorOrNil() error
