@@ -169,3 +169,11 @@ func VoidVargs(values ...error) []Out[Empty] {
 	}
 	return res
 }
+
+func Flat[T any](r []Out[[]T]) []Out[T] {
+	res := []Out[T]{}
+	for _, v := range r {
+		res = append(res, DisJoin(v)...)
+	}
+	return res
+}
