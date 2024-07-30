@@ -38,7 +38,7 @@ func ProofAsync(r ...ErrorContainer) Out[Empty] {
 }
 
 func eachFunc[T any, TT any](r []Out[T], f Successor[T, TT], and func(Out[T], Successor[T, TT]) Out[TT]) []Out[TT] {
-	res := make([]Out[TT], len(r))
+	res := make([]Out[TT], 0, len(r))
 	for _, v := range r {
 		res = append(res, and(v, f))
 	}
@@ -80,7 +80,7 @@ func SlicedAsync[T any, TT any](sliceSize int, r []Out[T], f Successor[[]T, []TT
 }
 
 func rangeFunc[TT any](n int, f Successor[int, TT], and func(Out[int], Successor[int, TT]) Out[TT]) []Out[TT] {
-	res := make([]Out[TT], n)
+	res := make([]Out[TT], 0, n)
 	for i := 0; i < n; i++ {
 		res = append(res, And(OK(i), f))
 	}
@@ -96,7 +96,7 @@ func RangeAsync[TT any](n int, f Successor[int, TT]) []Out[TT] {
 }
 
 func Join[T any](r []Out[T]) Out[[]T] {
-	res := make([]T, len(r))
+	res := make([]T, 0, len(r))
 	for _, v := range r {
 		if v.IsError() {
 			return Err[[]T](v.ErrorOrNil())
@@ -128,7 +128,7 @@ func DisJoin[T any](r Out[[]T]) []Out[T] {
 	if r.IsOK() {
 		var defaultV []T
 		values := r.GetOrDefault(defaultV)
-		res := make([]Out[T], len(values))
+		res := make([]Out[T], 0, len(values))
 		for _, v := range values {
 			res = append(res, OK(v))
 		}
@@ -163,7 +163,7 @@ func Void(err error) Out[Empty] {
 }
 
 func VoidVargs(values ...error) []Out[Empty] {
-	res := make([]Out[Empty], len(values))
+	res := make([]Out[Empty], 0, len(values))
 	for _, v := range values {
 		res = append(res, Void(v))
 	}
