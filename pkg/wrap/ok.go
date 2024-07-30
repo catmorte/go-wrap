@@ -46,7 +46,7 @@ func OK[T any](value T) Out[T] {
 }
 
 func OKVargs[T any](values ...T) []Out[T] {
-	res := make([]Out[T], len(values))
+	res := make([]Out[T], 0, len(values))
 	for _, v := range values {
 		res = append(res, OK(v))
 	}
