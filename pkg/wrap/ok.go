@@ -53,6 +53,14 @@ func OKVargs[T any](values ...T) []Out[T] {
 	return res
 }
 
+func OKSlice[T any](values []T) []Out[T] {
+	res := make([]Out[T], 0, len(values))
+	for _, v := range values {
+		res = append(res, OK(v))
+	}
+	return res
+}
+
 func (s ok[T]) Unwrap() (T, error) {
 	return s.v, nil
 }
