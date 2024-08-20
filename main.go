@@ -174,7 +174,7 @@ func main() {
 					i++
 				}
 			}
-			fileName := fmt.Sprintf("%s_wrap.go", strings.TrimSuffix(file, filepath.Ext(file)))
+			fileName := fmt.Sprintf("%s.wrap.gen.go", strings.TrimSuffix(file, filepath.Ext(file)))
 			fullPath := filepath.Join(path, fileName)
 			codeGenerated := generator.Generate(p.Name, *f, false)
 			return And(codeGenerated, func(raw []byte) Out[string] {
