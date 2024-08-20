@@ -8,11 +8,13 @@ Togeather with the list of handlers such as `And` (also `AndXN` where N is a num
 
 ## go generate
 
-U can `go install` this package and later use it via `//go:generate go-wrap` togeather with one of the flags `public`(default), `private` and `all` to generate wrappers for regular functions which can return few values like:
+U can `go install` this package and later use it via `//go:generate go-wrap` togeather with flags:
+- exclude: list of coma-separated functions' names
+- mode: `pub`(default), `priv`, `all`, `priv-rcv`, `pub-rcv`, `all-rcv`, `priv-fun`, `pub-fun` and `all-fun` to generate wrappers for regular funcs and methods which can return few values like:
 
-- ()
-- (V)
-- (error)
-- (V, error)
+  - ()
+  - (V)
+  - (error)
+  - (V, error)
 
 where V is value of any type
