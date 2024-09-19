@@ -1,8 +1,13 @@
 package wrap
 
-import "errors"
+import (
+	"errors"
+)
 
-var ErrChanClosed = errors.New("channel closed")
+var (
+	ErrChanClosed = errors.New("channel closed")
+	ErrNotFound   = errors.New("unable to find first, condition not met")
+)
 
 type (
 	Successor[T1, TT any]                                   func(T1) Out[TT]
@@ -31,7 +36,40 @@ func ProofAsync(r ...ErrorContainer) Out[Empty] {
 	})
 }
 
-func OKs[T any](r []Out[T]) []Out[T] {
+func first[T any](r []Out[T], test func(Out[T]) bool) Out[T] {
+	length := len(r)
+	chans := make(chan Out[T], length)
+	for _, v := range r {
+		v := v
+		go func() {
+			_ = v.IsOK()
+			chans <- v
+		}()
+	}
+	for v := range chans {
+		if test(v) {
+			return v
+		}
+		if length == 0 {
+			break
+		}
+	}
+	return Err[T](ErrNotFound)
+}
+
+func FirstOK[T any](r []Out[T]) Out[T] {
+	return first(r, func(o Out[T]) bool {
+		return o.IsOK()
+	})
+}
+
+func FirstErr[T any](r []Out[T]) Out[T] {
+	return first(r, func(o Out[T]) bool {
+		return o.IsError()
+	})
+}
+
+func OnlyOKs[T any](r []Out[T]) []Out[T] {
 	res := make([]Out[T], 0, len(r))
 	for _, v := range r {
 		if v.IsOK() {
@@ -41,7 +79,7 @@ func OKs[T any](r []Out[T]) []Out[T] {
 	return res
 }
 
-func NOKs[T any](r []Out[T]) []Out[T] {
+func OnlyErrors[T any](r []Out[T]) []Out[T] {
 	res := make([]Out[T], 0, len(r))
 	for _, v := range r {
 		if v.IsError() {
