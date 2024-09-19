@@ -26,9 +26,29 @@ func Proof(r ...ErrorContainer) Out[Empty] {
 }
 
 func ProofAsync(r ...ErrorContainer) Out[Empty] {
-	return Async[Empty](func() Out[Empty] {
+	return Async(func() Out[Empty] {
 		return Proof(r...)
 	})
+}
+
+func OKs[T any](r []Out[T]) []Out[T] {
+	res := make([]Out[T], 0, len(r))
+	for _, v := range r {
+		if v.IsOK() {
+			res = append(res, v)
+		}
+	}
+	return res
+}
+
+func NOKs[T any](r []Out[T]) []Out[T] {
+	res := make([]Out[T], 0, len(r))
+	for _, v := range r {
+		if v.IsError() {
+			res = append(res, v)
+		}
+	}
+	return res
 }
 
 func eachFunc[T any, TT any](r []Out[T], f Successor[T, TT], and func(Out[T], Successor[T, TT]) Out[TT]) []Out[TT] {
@@ -40,11 +60,11 @@ func eachFunc[T any, TT any](r []Out[T], f Successor[T, TT], and func(Out[T], Su
 }
 
 func Each[T any, TT any](r []Out[T], f Successor[T, TT]) []Out[TT] {
-	return eachFunc[T, TT](r, f, And)
+	return eachFunc(r, f, And)
 }
 
 func EachAsync[T any, TT any](r []Out[T], f Successor[T, TT]) []Out[TT] {
-	return eachFunc[T, TT](r, f, AndAsync)
+	return eachFunc(r, f, AndAsync)
 }
 
 func slicedFunc[T any, TT any](
@@ -76,7 +96,7 @@ func SlicedAsync[T any, TT any](sliceSize int, r []Out[T], f Successor[[]T, []TT
 func rangeFunc[TT any](n int, f Successor[int, TT], and func(Out[int], Successor[int, TT]) Out[TT]) []Out[TT] {
 	res := make([]Out[TT], 0, n)
 	for i := 0; i < n; i++ {
-		res = append(res, And(OK(i), f))
+		res = append(res, and(OK(i), f))
 	}
 	return res
 }
@@ -149,7 +169,7 @@ func Wrap[T any](val T, err error) Out[T] {
 	if err != nil {
 		return Err[T](err)
 	}
-	return OK[T](val)
+	return OK(val)
 }
 
 func Void(err error) Out[Empty] {
@@ -181,8 +201,8 @@ func And[T any, TT any](r Out[T], f Successor[T, TT]) Out[TT] {
 }
 
 func AndAsync[T any, TT any](r Out[T], f Successor[T, TT]) Out[TT] {
-	return Async[TT](func() Out[TT] {
-		return And[T, TT](r, f)
+	return Async(func() Out[TT] {
+		return And(r, f)
 	})
 }
 
@@ -198,7 +218,7 @@ func AndX2[T1, T2, TT any](r1 Out[T1], r2 Out[T2], f SuccessorX2[T1, T2, TT]) Ou
 }
 
 func AndX2Async[T1, T2, TT any](r1 Out[T1], r2 Out[T2], f SuccessorX2[T1, T2, TT]) Out[TT] {
-	return Async[TT](func() Out[TT] {
+	return Async(func() Out[TT] {
 		return AndX2(r1, r2, f)
 	})
 }
@@ -217,7 +237,7 @@ func AndX3[T1, T2, T3, TT any](r1 Out[T1], r2 Out[T2], r3 Out[T3], f SuccessorX3
 }
 
 func AndX3Async[T1, T2, T3, TT any](r1 Out[T1], r2 Out[T2], r3 Out[T3], f SuccessorX3[T1, T2, T3, TT]) Out[TT] {
-	return Async[TT](func() Out[TT] {
+	return Async(func() Out[TT] {
 		return AndX3(r1, r2, r3, f)
 	})
 }
@@ -238,7 +258,7 @@ func AndX4[T1, T2, T3, T4, TT any](r1 Out[T1], r2 Out[T2], r3 Out[T3], r4 Out[T4
 }
 
 func AndX4Async[T1, T2, T3, T4, TT any](r1 Out[T1], r2 Out[T2], r3 Out[T3], r4 Out[T4], f SuccessorX4[T1, T2, T3, T4, TT]) Out[TT] {
-	return Async[TT](func() Out[TT] {
+	return Async(func() Out[TT] {
 		return AndX4(r1, r2, r3, r4, f)
 	})
 }
@@ -261,7 +281,7 @@ func AndX5[T1, T2, T3, T4, T5, TT any](r1 Out[T1], r2 Out[T2], r3 Out[T3], r4 Ou
 }
 
 func AndX5Async[T1, T2, T3, T4, T5, TT any](r1 Out[T1], r2 Out[T2], r3 Out[T3], r4 Out[T4], r5 Out[T5], f SuccessorX5[T1, T2, T3, T4, T5, TT]) Out[TT] {
-	return Async[TT](func() Out[TT] {
+	return Async(func() Out[TT] {
 		return AndX5(r1, r2, r3, r4, r5, f)
 	})
 }
@@ -286,7 +306,7 @@ func AndX6[T1, T2, T3, T4, T5, T6, TT any](r1 Out[T1], r2 Out[T2], r3 Out[T3], r
 }
 
 func AndX6Async[T1, T2, T3, T4, T5, T6, TT any](r1 Out[T1], r2 Out[T2], r3 Out[T3], r4 Out[T4], r5 Out[T5], r6 Out[T6], f SuccessorX6[T1, T2, T3, T4, T5, T6, TT]) Out[TT] {
-	return Async[TT](func() Out[TT] {
+	return Async(func() Out[TT] {
 		return AndX6(r1, r2, r3, r4, r5, r6, f)
 	})
 }
@@ -313,7 +333,7 @@ func AndX7[T1, T2, T3, T4, T5, T6, T7, TT any](r1 Out[T1], r2 Out[T2], r3 Out[T3
 }
 
 func AndX7Async[T1, T2, T3, T4, T5, T6, T7, TT any](r1 Out[T1], r2 Out[T2], r3 Out[T3], r4 Out[T4], r5 Out[T5], r6 Out[T6], r7 Out[T7], f SuccessorX7[T1, T2, T3, T4, T5, T6, T7, TT]) Out[TT] {
-	return Async[TT](func() Out[TT] {
+	return Async(func() Out[TT] {
 		return AndX7(r1, r2, r3, r4, r5, r6, r7, f)
 	})
 }
@@ -342,7 +362,7 @@ func AndX8[T1, T2, T3, T4, T5, T6, T7, T8, TT any](r1 Out[T1], r2 Out[T2], r3 Ou
 }
 
 func AndX8Async[T1, T2, T3, T4, T5, T6, T7, T8, TT any](r1 Out[T1], r2 Out[T2], r3 Out[T3], r4 Out[T4], r5 Out[T5], r6 Out[T6], r7 Out[T7], r8 Out[T8], f SuccessorX8[T1, T2, T3, T4, T5, T6, T7, T8, TT]) Out[TT] {
-	return Async[TT](func() Out[TT] {
+	return Async(func() Out[TT] {
 		return AndX8(r1, r2, r3, r4, r5, r6, r7, r8, f)
 	})
 }
@@ -373,7 +393,7 @@ func AndX9[T1, T2, T3, T4, T5, T6, T7, T8, T9, TT any](r1 Out[T1], r2 Out[T2], r
 }
 
 func AndX9Async[T1, T2, T3, T4, T5, T6, T7, T8, T9, TT any](r1 Out[T1], r2 Out[T2], r3 Out[T3], r4 Out[T4], r5 Out[T5], r6 Out[T6], r7 Out[T7], r8 Out[T8], r9 Out[T9], f SuccessorX9[T1, T2, T3, T4, T5, T6, T7, T8, T9, TT]) Out[TT] {
-	return Async[TT](func() Out[TT] {
+	return Async(func() Out[TT] {
 		return AndX9(r1, r2, r3, r4, r5, r6, r7, r8, r9, f)
 	})
 }
