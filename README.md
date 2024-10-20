@@ -1,20 +1,32 @@
 # go-wrap
 
-## probably it's just some sort of brainfuck, but still pretty funny concept imho.
+## Overview
 
-So, the concept is to use `Out[T]` for each func within the project, or to use `Wrap[T](val T, err error)` (yet another function in this package to wrap common touples `return val, err`), or just `OK[T](v T)` / `Err[T](err error)` to convert any value to it.
+The concept of this package is to use `Out[T]` for each function within the project or to use `Wrap[T](val T, err error)` (another function in this package to wrap common tuples like `return val, err`). Alternatively, you can use `OK[T](v T)` or `Err[T](err error)` to convert any value into these forms.
 
-Togeather with the list of handlers such as `And` (also `AndXN` where N is a number up to 9), `Join`, `Proof`, `Range`, `Each`, `ReadChan`, `Sliced` (plus `**Async` versions of those functions) and also `Just`,`DisJoin`, `Flat` to reach some kind of declarative style.
+The package includes a list of handlers such as `And` (also `AndXN` where N is a number up to 9), `Join`, `Proof`, `Range`, `Each`, `ReadChan`, `Sliced` (with `Async` versions of these functions). Additionally, `Just`, `DisJoin`, and `Flat` are provided to create a more declarative style.
 
 ## go generate
 
-U can `go install` this package and later use it via `//go:generate go-wrap` togeather with flags:
-- exclude: list of coma-separated functions' names
-- mode: `pub`(default), `priv`, `all`, `priv-rcv`, `pub-rcv`, `all-rcv`, `priv-fun`, `pub-fun` and `all-fun` to generate wrappers for regular funcs and methods which can return few values like:
+You can `go install` this package and later use it with `//go:generate go-wrap`, along with the following flags:
 
-  - ()
-  - (V)
-  - (error)
-  - (V, error)
+- **exclude**: A list of comma-separated function names to exclude.
+- **mode**: Specifies the visibility and type of functions to generate. Available options are:
+  - `pub` (default)
+  - `priv`
+  - `all`
+  - `priv-rcv`
+  - `pub-rcv`
+  - `all-rcv`
+  - `priv-fun`
+  - `pub-fun`
+  - `all-fun`
 
-where V is value of any type
+These flags are used to generate wrappers for regular functions and methods that can return a variety of signatures:
+
+- ()
+- (V)
+- (error)
+- (V, error)
+
+Where `V` is a value of any type.
